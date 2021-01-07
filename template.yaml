@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  pillow-simd-function
+
+  Sample SAM Template for pillow-simd-function
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 300
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: 'pillow-function-bucket'
+
+Resources:
+  PillowFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      ImageUri: ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/pillow-function
+      Policies:
+        - S3CrudPolicy: 
+            BucketName: !Ref BucketName 
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./src
+      DockerTag: pillow-function-v1
+
+Outputs:
+  PillowFunction:
+    Description: "PillowFunction Lambda Function ARN"
+    Value: !GetAtt PillowFunction.Arn
+  PillowFunctionIamRole:
+    Description: "Implicit IAM Role created for PillowFunction function"
+    Value: !GetAtt PillowFunctionRole.Arn
